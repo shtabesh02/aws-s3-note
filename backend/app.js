@@ -56,7 +56,7 @@ app.post('/api/photos/:url', upload.single('photo-url'), async (req, res) => {
 
     console.log('POST testing...')
     // image resizing
-    const buffer = await sharp(req.file.buffer).resize({height:180, width:170, fit: 'contain'}).toBuffer();
+    const buffer = await sharp(req.file.buffer).resize({height:300, width:250, fit: 'contain'}).toBuffer();
 
     const params = {
         Bucket: bucketName,
@@ -75,6 +75,28 @@ app.post('/api/photos/:url', upload.single('photo-url'), async (req, res) => {
     });
 
     res.send(save2db)
+});
+
+app.get('/api/photos', async (req, res) => {
+
+    console.log('call from api....')
+    const photos = await Photo.findOne({
+        order: [['id', 'DESC']],
+        limit: 1
+    });
+
+    console.log('photos app.sj: ', photos)
+
+
+    const getObjectParams = {
+        Bucket: bucketName,
+        Key: photos.url
+    }
+    const command = new GetObjectCommand(getObjectParams);
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+
+    res.send(url);
 })
 
 const PORT = process.env.PORT;

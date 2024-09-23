@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import './App.css'
 
 function App() {
   const [photo, setPhoto] = useState(0);
-  const [uploadedPhoto, setUploadedPhoto] = useState();
+  const [uploadedPhoto, setUploadedPhoto] = useState(null);
+  const [profile, setProfile] = useState(null);
+
   // const photoname = 12;
   const handleUploadingThePhoto = async (e) => {
     e.preventDefault();
@@ -12,17 +14,35 @@ function App() {
     formData.append('photo-url', photo);
 
     await axios.post(`/api/photos/${photo}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then(response => {
-        console.log('response: ', response.data['url'])
-        setUploadedPhoto(response.data['url'])
+      .then(async (response) => {
+        const result = await axios.get(`/api/photos/${response.data['url']}`);
+        const result2 = Object.values(result)[0][0]['imageUrl'];
+        setUploadedPhoto(result2);
       })
 
   }
+  useEffect(() => {
+     const getPhotos = async () => {
+      try {
+        const photos = await axios.get('/api/photos');
+        console.log('profile photo: ', photos);
+        setProfile(photos.data)
+      } catch (error) {
+        console.error('Error fetching photos: ', error)
+      }
+    }
+    getPhotos();
+  }, []);
+
   return (
     <>
 
       <div className='photoframe'>
-        <img src={uploadedPhoto} alt="Photo not found" />
+        {
+        uploadedPhoto ? <img src={uploadedPhoto} alt="Photo not found" />:
+        <img src={profile} alt="Photo not found" />
+        }
+        
       </div>
       <div>
         <form onSubmit={handleUploadingThePhoto}>
