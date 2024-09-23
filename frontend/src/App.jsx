@@ -1,33 +1,34 @@
 import { useState } from 'react'
-import {NavLink} from 'react-router-dom'
 import axios from 'axios'
 import './App.css'
 
 function App() {
   const [photo, setPhoto] = useState(0);
-  const photoname = 12;
-  const [message, setMessage] = useState();
-  const handleUploadingThePhoto = async (e)  => {
+  const [uploadedPhoto, setUploadedPhoto] = useState();
+  // const photoname = 12;
+  const handleUploadingThePhoto = async (e) => {
     e.preventDefault();
-    const formDate = new FormData();
-    formDate.append('photo', photo);
+    const formData = new FormData();
+    formData.append('photo-url', photo);
 
-    await axios(`/api/photos/${photoname}`)
-    .then((response) => setMessage(response))
+    await axios.post(`/api/photos/${photo}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then(response => {
+        console.log('response: ', response.data['url'])
+        setUploadedPhoto(response.data['url'])
+      })
 
   }
   return (
     <>
-   
+
       <div className='photoframe'>
-        <img src="" alt="Photo not found" />
+        <img src={uploadedPhoto} alt="Photo not found" />
       </div>
       <div>
         <form onSubmit={handleUploadingThePhoto}>
-          <input type="file" accept='image/*' name='photo' onChange={e => setPhoto(e.target.files[0])} /> <br />
+          <input type="file" accept='image/*' name='photo-url' onChange={e => setPhoto(e.target.files[0])} /> <br />
           <button>Upload a new photo</button>
         </form>
-        <p>The uploaded message {message}</p>
         <button>Delete this photo</button>
       </div>
       {/* <NavLink to={`/api/photos/1`}>Get the details</NavLink> */}
