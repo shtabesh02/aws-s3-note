@@ -54,7 +54,7 @@ app.post('/api/photos/:url', upload.single('photo-url'), async (req, res) => {
 
     const imageName = randomImageName();
 
-    console.log('POST testing...')
+    // console.log('POST testing...')
     // image resizing
     const buffer = await sharp(req.file.buffer).resize({height:300, width:250, fit: 'contain'}).toBuffer();
 
@@ -79,13 +79,13 @@ app.post('/api/photos/:url', upload.single('photo-url'), async (req, res) => {
 
 app.get('/api/photos', async (req, res) => {
 
-    console.log('call from api....')
+    // console.log('call from api....')
     const photos = await Photo.findOne({
         order: [['id', 'DESC']],
         limit: 1
     });
 
-    console.log('photos app.sj: ', photos)
+    // console.log('photos app.sj: ', photos)
 
 
     const getObjectParams = {

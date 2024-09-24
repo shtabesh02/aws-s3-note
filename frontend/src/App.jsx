@@ -25,7 +25,7 @@ function App() {
      const getPhotos = async () => {
       try {
         const photos = await axios.get('/api/photos');
-        console.log('profile photo: ', photos);
+        // console.log('profile photo: ', photos);
         setProfile(photos.data)
       } catch (error) {
         console.error('Error fetching photos: ', error)
